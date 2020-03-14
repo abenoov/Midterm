@@ -1,5 +1,6 @@
 package kz.iitu.mukhtar.electricity.service;
 
+import kz.iitu.mukhtar.electricity.Accountant;
 import kz.iitu.mukhtar.electricity.entity.User;
 import kz.iitu.mukhtar.electricity.dao.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ public class UserService {
     @Autowired
     private BillService billService;
 
+    @Autowired
+    Accountant accountant;
 
     @Autowired
     public UserService(UserDao userDao) {
@@ -22,7 +25,7 @@ public class UserService {
     }
 
     public void updateUserMoney(int id, int money) {
-        userDao.updateSalary(id, money);
+        userDao.updateMoney(id, money);
     }
 
     public void showAllUsers() {
@@ -49,6 +52,11 @@ public class UserService {
         int user_id = sc.nextInt();
 
         billService.addBill(name,price, kwh, user_id);
+    }
+
+
+    public void payBill(int id){
+        accountant.payBill(id);
     }
 
 }

@@ -5,6 +5,8 @@ import kz.iitu.mukhtar.electricity.dao.mappers.BillMapper;
 import kz.iitu.mukhtar.electricity.database.Database;
 import kz.iitu.mukhtar.electricity.entity.Bill;
 import kz.iitu.mukhtar.electricity.entity.User;
+import kz.iitu.mukhtar.electricity.event.BillCreatedEvent;
+import kz.iitu.mukhtar.electricity.event.BillPayedEvent;
 import kz.iitu.mukhtar.electricity.event.UserCreateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,6 +25,7 @@ public class BillDao implements ApplicationEventPublisherAware {
 
     private final String GET_ALL_BILLS = "SELECT * FROM bills WHERE user_id=";
     private final String GET_BILL_BY_ID = "SELECT * FROM bills WHERE id =";
+    private final String GET_BILL_BY_USER_ID = "SELECT * FROM bills WHERE user_id =";
     private final String DELETE_BILL = "DELETE FROM bills WHERE id =";
     private final String ADD_BILL = "INSERT INTO bills(name , kwh, price, user_id) VALUES";
 
@@ -40,12 +43,21 @@ public class BillDao implements ApplicationEventPublisherAware {
         return jdbcTemplate.query(GET_ALL_BILLS, new BillMapper());
     }
 
-    public List<Bill> getUserById(int id) {
-        return jdbcTemplate.query(GET_BILL_BY_ID + id, new BillMapper());
+    public Bill getBillById(int id) {
+        return jdbcTemplate.query(GET_BILL_BY_ID + id, new BillMapper()).get(0);
+    }
+
+    public List<Bill> getUserBill(int id) {
+        return jdbcTemplate.query(GET_BILL_BY_USER_ID + id, new BillMapper());
     }
 
     public void addBill(String name, int price, int kwh, int user_id) {
-        jdbcTemplate.execute(ADD_BILL + "('" + name + "'," + kwh + "," + price + "," + user_id + ""+")");
+        jdbcTemplate.execute(ADD_BILL + "('" + name + "'," + kwh + "," + price + "," + user_id + "" + ")");
+        this.eventPublisher.publishEvent(new BillCreatedEvent(this, getUserBill(user_id).get(0)));
+    }
+
+    public void deleteBill(int id) {
+        jdbcTemplate.execute(DELETE_BILL + id);
     }
 
     @Override

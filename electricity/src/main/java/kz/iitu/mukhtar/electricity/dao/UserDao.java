@@ -3,7 +3,9 @@ package kz.iitu.mukhtar.electricity.dao;
 import kz.iitu.mukhtar.electricity.entity.User;
 import kz.iitu.mukhtar.electricity.dao.mappers.UserMapper;
 import kz.iitu.mukhtar.electricity.database.Database;
+import kz.iitu.mukhtar.electricity.event.BillPayedEvent;
 import kz.iitu.mukhtar.electricity.event.UserCreateEvent;
+import kz.iitu.mukhtar.electricity.event.UserUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -30,12 +32,9 @@ public class UserDao implements ApplicationEventPublisherAware {
         this.jdbcTemplate = new JdbcTemplate(database.getDataSource());
     }
 
-    public void create(User user) {
-        this.eventPublisher.publishEvent(new UserCreateEvent(this, user));
-    }
-
-    public void updateSalary(int id, int money) {
+    public void updateMoney(int id, int money) {
         jdbcTemplate.execute(UPDATE_USER_MONEY + money + "WHERE id =" + id);
+        this.eventPublisher.publishEvent(new UserUpdateEvent(this, getUserById(id).get(0)));
     }
 
     public List<User> getAll() {
