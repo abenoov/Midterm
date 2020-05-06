@@ -1,41 +1,75 @@
 package kz.iitu.mukhtar.electricity.entity;
 
 
-public class User {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "Users")
+@Entity
+public class User implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
-    private int id;
-    private int money;
+    private Long money;
 
-    public String getName() {
-        return name;
-    }
+    private String role;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Column(unique = true)
+    private String username;
+    private String password;
 
-    public int getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Bill> bills = new HashSet<>();
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "checkout_id")
+    private Checkouts checkouts;
 
-    public int getMoney() {
-        return money;
-    }
+    @ToString.Exclude
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
+    )
+    private Set<Role> roles;
 
-    public void setMoney(int money) {
-        this.money = money;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
-                ", money=" + money +
-                '}';
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

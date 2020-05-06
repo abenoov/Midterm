@@ -1,20 +1,55 @@
 package kz.iitu.mukhtar.electricity.service;
 
-import kz.iitu.mukhtar.electricity.dao.BillDao;
-import kz.iitu.mukhtar.electricity.dao.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import kz.iitu.mukhtar.electricity.entity.Bill;
+import kz.iitu.mukhtar.electricity.entity.User;
+import kz.iitu.mukhtar.electricity.exceptions.UserNotFoundException;
+import kz.iitu.mukhtar.electricity.repository.BillRepository;
+import kz.iitu.mukhtar.electricity.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Scanner;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
+@AllArgsConstructor
 @Component
 public class BillService {
 
-    @Autowired
-    private BillDao billDao;
+    private BillRepository billRepository;
+    private UserRepository userRepository;
 
 
-    public void addBill(String name, int price, int kwh, int user_id){
-        billDao.addBill(name, price, kwh, user_id);
+    public List<Bill> showAllBills(Long id) {
+        return billRepository.findBillByUserId(id);
     }
+
+    public User addBill(User user, Bill bill) {
+        Set<Bill> bills = user.getBills();
+        bills.add(bill);
+        user.setBills(bills);
+        return user;
+    }
+
+
+    public User removeBill(User user, Bill bill) {
+        Set<Bill> bills = user.getBills();
+        bills.remove(bill);
+        user.setBills(bills);
+        return user;
+    }
+
+    public Bill newBill(Bill bill) {
+        return billRepository.save(bill);
+    }
+
+    public Bill findBillById(Long id) throws UserNotFoundException {
+        Optional<Bill> bill = billRepository.findById(id);
+        if (bill == null) {
+            throw new UserNotFoundException();
+        }
+        return bill.get();
+    }
+
+
 }

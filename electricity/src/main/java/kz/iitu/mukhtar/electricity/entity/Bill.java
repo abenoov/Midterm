@@ -1,49 +1,24 @@
 package kz.iitu.mukhtar.electricity.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
 public class Bill {
-    private int id;
-    private int kwh;
-    private String name;
-    private int price;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long kwh;
+//    private String name;
+    private Long price;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getKwh() {
-        return kwh;
-    }
-
-    public void setKwh(int kwh) {
-        this.kwh = kwh;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    @Override
-    public String toString() {
-        return "Bill{" +
-                "id=" + id +
-                ", kwh=" + kwh +
-                ", tariff='" + name + '\'' +
-                '}';
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

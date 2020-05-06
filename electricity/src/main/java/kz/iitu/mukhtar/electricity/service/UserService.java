@@ -1,62 +1,78 @@
 package kz.iitu.mukhtar.electricity.service;
 
-import kz.iitu.mukhtar.electricity.Accountant;
+
+import kz.iitu.mukhtar.electricity.entity.Role;
 import kz.iitu.mukhtar.electricity.entity.User;
-import kz.iitu.mukhtar.electricity.dao.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import kz.iitu.mukhtar.electricity.exceptions.NoRoleException;
+import kz.iitu.mukhtar.electricity.exceptions.UserNotFoundException;
+import kz.iitu.mukhtar.electricity.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Optional;
+import java.util.Set;
 
+@AllArgsConstructor
 @Component
-public class UserService {
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private BillService billService;
+public class UserService implements UserDetailsService {
 
-    @Autowired
-    Accountant accountant;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
 
-    @Autowired
-    public UserService(UserDao userDao) {
-        this.userDao = userDao;
-    }
-
-    public void updateUserMoney(int id, int money) {
-        userDao.updateMoney(id, money);
-    }
-
-    public void showAllUsers() {
-        List<User> employees = userDao.getAll();
-        System.out.println();
-        System.out.println("Employees list: ");
-        for (User employee : employees) {
-            System.out.println(employee.toString());
+    public User findUserById(Long id) throws UserNotFoundException {
+        Optional<User> user = userRepository.findById(id);
+        if (user == null) {
+            throw new UserNotFoundException();
         }
-        System.out.println();
+        System.out.println(user);
+        return user.orElseGet(null);
     }
 
-    public void addBillToUser(){
-        Scanner sc = new Scanner(System.in);
+    public List<User> showAllUsers() {
+        return userRepository.findAll();
+    }
 
+    private boolean isUserExist(User user) {
+        if (user == null) {
+            System.out.println("Error, user does not exist");
+            return false;
+        } else
+            return true;
+    }
 
-        System.out.println("Enter name of the tariff:");
-        String name = sc.nextLine();
-        System.out.println("Enter price for the tarif:");
-        int price = sc.nextInt();
-        System.out.println("Enter kwh used:");
-        int kwh = sc.nextInt();
-        System.out.println("Enter user_id:");
-        int user_id = sc.nextInt();
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username);
 
-        billService.addBill(name,price, kwh, user_id);
+        if (user == null)
+            throw new UsernameNotFoundException("User with username: " + username + " is not found");
+
+        return user;
     }
 
 
-    public void payBill(int id){
-        accountant.payBill(id);
+    public User saveUser(User user) {
+        Set<Role> roles = new HashSet<>();
+        Role userRole = roleRepository.findByName(user.getRole());
+        System.out.println(userRole);
+        if (userRole != null) {
+            roles.add(userRole);
+        } else
+            throw new NoRoleException();
+        user.setRoles(roles);
+        user.setPassword(passwordEncoder().encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }
