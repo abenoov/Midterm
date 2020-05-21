@@ -20,6 +20,12 @@ public class BillController {
     private BillService billService;
     private UserService userService;
 
+    @ApiOperation(value = "get all bills", response = List.class)
+    @GetMapping("")
+    public List<Bill> getAll() {
+        return billService.showAllBills();
+    }
+
     @ApiOperation(value = "Create a new bills", response = List.class)
     @PostMapping("/newBill")
     public Bill newBills(@RequestBody Bill bill) {

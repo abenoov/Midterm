@@ -9,6 +9,8 @@ import kz.iitu.mukhtar.electricity.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,7 +22,14 @@ public class CheckoutService {
     private UserRepository userRepository;
     private CheckoutsRepository checkoutsRepository;
 
-    public Checkouts newCheckout(Checkouts checkout){
+    public Checkouts newCheckout(User user){
+        Checkouts checkout = new Checkouts();
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        checkout.setPayDate(date);
+        checkout.setPayedStatus(true);
+        Set<User> users = checkout.getUsers();
+        users.add(user);
+
         return checkoutsRepository.save(checkout);
     }
 

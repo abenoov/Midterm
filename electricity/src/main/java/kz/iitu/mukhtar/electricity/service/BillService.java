@@ -20,15 +20,15 @@ public class BillService {
     private UserRepository userRepository;
 
 
-    public List<Bill> showAllBills(Long id) {
-        return billRepository.findBillByUserId(id);
+    public List<Bill> showAllBills() {
+        return billRepository.findAll();
     }
 
     public User addBill(User user, Bill bill) {
         Set<Bill> bills = user.getBills();
         bills.add(bill);
         user.setBills(bills);
-        return user;
+        return userRepository.save(user);
     }
 
 
@@ -36,7 +36,7 @@ public class BillService {
         Set<Bill> bills = user.getBills();
         bills.remove(bill);
         user.setBills(bills);
-        return user;
+        return userRepository.save(user);
     }
 
     public Bill newBill(Bill bill) {

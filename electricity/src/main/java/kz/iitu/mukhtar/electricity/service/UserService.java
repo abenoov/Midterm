@@ -61,7 +61,7 @@ public class UserService implements UserDetailsService {
     public User saveUser(User user) {
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName(user.getRole());
-        System.out.println(userRole);
+        System.out.println(user);
         if (userRole != null) {
             roles.add(userRole);
         } else

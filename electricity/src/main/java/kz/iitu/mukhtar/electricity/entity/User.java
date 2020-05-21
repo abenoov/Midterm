@@ -32,7 +32,7 @@ public class User implements UserDetails {
     private String username;
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY)
     private Set<Bill> bills = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

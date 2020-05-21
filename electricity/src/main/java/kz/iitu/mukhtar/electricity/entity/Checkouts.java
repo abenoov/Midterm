@@ -20,8 +20,7 @@ public class Checkouts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private Date checkedDate;
-    private Date payDate;
+    private String payDate;
     private boolean payedStatus;
 
 

@@ -43,8 +43,9 @@ public class CheckoutController {
 
     @ApiOperation(value = "Get make checkout for user", response = User.class)
     @PostMapping("/new/")
-    public Checkouts newCheckout(@RequestBody() Checkouts checkouts) {
-        return checkoutService.newCheckout(checkouts);
+    public Checkouts newCheckout(@RequestParam("user_id") Long userId) throws UserNotFoundException {
+        User user = userService.findUserById(userId);
+        return checkoutService.newCheckout(user);
 
     }
 
