@@ -1,4 +1,4 @@
-# Midterm
+# Final Exam (Report)
  
 This is electricity counting system.
 
@@ -11,10 +11,10 @@ entity -> dao -> service -> controller
 
 Here:
 
-entity -> Bill and User 
+entity -> Bill, User, Checkout and Role 
 dao -> BillDao and UserDao 
-service -> BillService and UserService
-controller -> MainController
+service -> BillService, UserService, CheckoutService, RoleRepository
+controller -> MainController, CheckoutController, UserController
 
 Facade pattern was used in this project.
 
